@@ -13,48 +13,35 @@ import { AgmDirectionModule } from 'agm-direction';
   selector: 'app',
   template: `
   <h1>Agm-Direction Playground - <a href="https://github.com/explooosion/Agm-Direction" target="_blank">Github</a></h1>
-  <button type="button" (click)="getDirection()">Get</button>
-  <button type="button" (click)="rmDirection()">Remove</button>
-  <agm-map [latitude]="lat" [longitude]="lng">
-    <agm-direction *ngIf="dir" [origin]="dir.origin" [destination]="dir.destination" [visible]="visible" [renderOptions]="renderOpts" [markerOptions]="markerOpts"></agm-direction>
+  <div class="map">
+  <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom">
+    <agm-direction *ngIf="dir" [origin]="dir.origin" [destination]="dir.destination" [renderOptions]="dir.renderOptions" (onClick)="click($event)"></agm-direction>
   </agm-map>
+  </div> 
   `
 })
 class AppComponent {
 
   lat: Number = 24.799448;
   lng: Number = 120.979021;
-  zoom: Number = 14;
+  zoom: Number = 15;
 
-  dir: any = undefined;
-
-  visible: boolean = true;
-
-  renderOpts = {
-    suppressMarkers: true,
+  dir = {
+    origin: { lat: 24.799448, lng: 120.979021 },
+    destination: { lat: 24.799108, lng: 120.970021 },
+    renderOptions: {
+      suppressPolylines: true,
+    },
+    visible: true,
   };
 
-  markerOpts = {
-    origin: {
-      icon: 'http://image.ibb.co/bZ3wLn/origin.png',
-    },
-    destination: {
-      icon: 'https://image.ibb.co/cLwp5n/678111_map_marker_256.png',
-      label: 'marker label',
-      opacity: 0.5,
-    },
-  };
+  constructor() { }
 
-  getDirection() {
-    this.dir = {
-      origin: { lat: 24.799448, lng: 120.979221 },
-      destination: { lat: 24.799524, lng: 120.975017 },
-    }
-    this.visible = true;
-  }
-
-  rmDirection() {
-    this.visible = false;
+  click(event: any) {
+    console.info('click', event);
+    console.info('x', event.latLng.lat());
+    console.info('y', event.latLng.lng());
+    console.info('mouse', event.xa);
   }
 
 }

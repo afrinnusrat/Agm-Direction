@@ -20,9 +20,10 @@ export class AgmDirection implements OnChanges, OnInit {
   @Input() renderOptions: any;
   @Input() visible: boolean = true;
   @Input() panel: object | undefined;
-  @Input() markerOptions: { origin: any, destination: any };
+  @Input() markerOptions: { origin: any, destination: any } = { origin: undefined, destination: undefined };
 
   @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
+  @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
 
   public directionsService: any = undefined;
   public directionsDisplay: any = undefined;
@@ -46,7 +47,7 @@ export class AgmDirection implements OnChanges, OnInit {
      */
     if (!this.visible) {
       try {
-        if (this.originMarker !== 'undefined') {
+        if (typeof this.originMarker !== 'undefined') {
           this.originMarker.setMap(null);
           this.destinationMarker.setMap(null);
         }
@@ -66,7 +67,7 @@ export class AgmDirection implements OnChanges, OnInit {
        */
       if (obj.renderOptions) {
         if (obj.renderOptions.firstChange === false) {
-          if (this.originMarker !== 'undefined') {
+          if (typeof this.originMarker !== 'undefined') {
             this.originMarker.setMap(null);
             this.destinationMarker.setMap(null);
           }
@@ -121,8 +122,22 @@ export class AgmDirection implements OnChanges, OnInit {
            * https://developers.google.com/maps/documentation/javascript/directions?hl=en#DirectionsResults
            */
 
+          // Replace the default route
+          const path = response.routes[0].overview_path
+          const routePath = new google.maps.Polyline({
+            path: path,
+            geodesic: true,
+            strokeColor: '#6CB0F2',
+            strokeOpacity: 0.8,
+            strokeWeight: 5,
+          });
+          routePath.setMap(map);
+          google.maps.event.addListener(routePath, 'click', event => {
+            this.onClick.emit(event);
+          })
+
           // Custom Markers 
-          if (this.markerOptions !== undefined) {
+          if (typeof this.markerOptions.origin !== 'undefined') {
             var _route = response.routes[0].legs[0];
             // Origin Marker
             this.markerOptions.origin.map = map;
