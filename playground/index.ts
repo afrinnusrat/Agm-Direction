@@ -2,8 +2,7 @@
  * This is only for local test
  */
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { Component } from '@angular/core';
+import { NgModule, Component } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AgmCoreModule } from '@agm/core';
@@ -31,6 +30,9 @@ class AppComponent {
     destination: { lat: 24.799108, lng: 120.970021 },
     renderOptions: {
       suppressPolylines: true,
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.8,
+      strokeWeight: 5,
     },
     visible: true,
   };
@@ -42,6 +44,15 @@ class AppComponent {
     console.info('x', event.latLng.lat());
     console.info('y', event.latLng.lng());
     console.info('mouse', event.xa);
+
+    this.dir.renderOptions = {
+      suppressPolylines: true,
+      strokeColor: '#6CB0F2',
+      strokeOpacity: 0.8,
+      strokeWeight: 5,
+    }
+    this.dir.visible = false;
+    this.dir.visible = true;
   }
 
 }

@@ -1,11 +1,11 @@
-import { Directive, Input, Output, OnChanges, OnInit, EventEmitter, ElementRef } from '@angular/core';
+import { Directive, Input, Output, OnChanges, OnInit, DoCheck, EventEmitter, ElementRef } from '@angular/core';
 import { GoogleMapsAPIWrapper } from '@agm/core';
 
 declare var google: any;
 @Directive({
   selector: 'agm-direction'
 })
-export class AgmDirection implements OnChanges, OnInit {
+export class AgmDirection implements OnChanges, OnInit, DoCheck {
 
   @Input() origin: { lat: Number, lng: Number };
   @Input() destination: { lat: Number, lng: Number };
@@ -32,6 +32,7 @@ export class AgmDirection implements OnChanges, OnInit {
 
   private originMarker = undefined;
   private destinationMarker = undefined;
+  private routePath = undefined;
 
   constructor(
     private gmapsApi: GoogleMapsAPIWrapper,
@@ -41,10 +42,15 @@ export class AgmDirection implements OnChanges, OnInit {
     this.directionDraw();
   }
 
+  ngDoCheck() {
+    console.log('check');
+  }
+
   ngOnChanges(obj: any) {
     /**
      * When visible is false then remove the direction layer
      */
+    console.log(obj);
     if (!this.visible) {
       try {
         if (typeof this.originMarker !== 'undefined') {
@@ -123,16 +129,25 @@ export class AgmDirection implements OnChanges, OnInit {
            */
 
           // Replace the default route
-          const path = response.routes[0].overview_path
-          const routePath = new google.maps.Polyline({
-            path: path,
-            geodesic: true,
-            strokeColor: '#6CB0F2',
-            strokeOpacity: 0.8,
-            strokeWeight: 5,
-          });
-          routePath.setMap(map);
-          google.maps.event.addListener(routePath, 'click', event => {
+          const path = response.routes[0].overview_path;
+          let pathOption = this.renderOptions;
+          pathOption.path = path;
+          pathOption.geodesic = true;
+
+          // {
+          //   strokeColor: '#6CB0F2',
+          //   strokeOpacity: 0.8,
+          //   strokeWeight: 5,
+          // }
+          if (typeof this.routePath !== 'undefined') {
+            this.routePath.setMap(null);
+          }
+          this.routePath = new google.maps.Polyline(
+            pathOption
+          );
+
+          this.routePath.setMap(map);
+          google.maps.event.addListener(this.routePath, 'click', event => {
             this.onClick.emit(event);
           })
 
